@@ -1,16 +1,18 @@
-// Initialize Supabase
+// ✅ This version fully removes localStorage and uses Supabase instead.
+// 🌩️ You still use Cloudinary for image upload
+
 const SUPABASE_URL = 'https://djhsduwbtxwqxunxfryf.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRqaHNkdXdidHh3cXh1bnhmcnlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM1NDI1NzIsImV4cCI6MjA2OTExODU3Mn0.oiy4qTjQhPZC495z3ZSGTsFFu4dDbHFDqzoQRb9d6tw';
 const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-let photos = [];
 let currentPage = 0;
-let deleteIndex = null;
+let allPhotos = [];
+let deleteId = null;
 
-function goToPage(page) {
+async function goToPage(page) {
   document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
   document.getElementById(`${page}-page`).classList.remove('hidden');
-  if (page === 'memories') loadPhotos();
+  if (page === 'memories') await renderMemories();
 }
 
 async function savePhoto() {
@@ -33,42 +35,41 @@ async function savePhoto() {
       method: "POST",
       body: formData
     });
-
     const data = await res.json();
-    const imageUrl = data.secure_url;
-    const caption = captionInput.value.trim();
 
-    // Insert into Supabase
-    const { error } = await supabase.from("photos").insert([{ src: imageUrl, caption }]);
-    if (error) throw error;
+    const photo = {
+      src: data.secure_url,
+      caption: captionInput.value.trim()
+    };
+
+    // Save to Supabase
+    await supabase.from("photos").insert([photo]);
 
     captionInput.value = "";
     photoInput.value = "";
-    document.getElementById('successModal').style.display = 'flex';
 
-    loadPhotos(); // Refresh photos
+    note.style.display = "block";
+
+    document.getElementById('successModal').style.display = 'flex';
   } catch (err) {
+    alert("Upload failed. Please try again.");
     console.error(err);
-    alert("Upload failed.");
   }
 }
 
-
-async function loadPhotos() {
+async function renderMemories() {
   const { data, error } = await supabase.from("photos").select("*").order("id", { ascending: true });
+
   if (error) {
-    console.error(error);
+    console.error("Failed to load photos:", error);
     return;
   }
-  photos = data || [];
-  renderMemories();
-}
 
-function renderMemories() {
+  allPhotos = data;
   const book = document.getElementById('book');
   const noPhotoMsg = document.getElementById('no-photo');
 
-  if (photos.length === 0) {
+  if (allPhotos.length === 0) {
     noPhotoMsg.style.display = 'block';
     book.innerHTML = '';
     return;
@@ -76,7 +77,7 @@ function renderMemories() {
   noPhotoMsg.style.display = 'none';
 
   const start = currentPage * 8;
-  const spread = photos.slice(start, start + 8);
+  const spread = allPhotos.slice(start, start + 8);
   const paddedSpread = [...spread];
 
   while (paddedSpread.length < 8) {
@@ -98,9 +99,8 @@ function renderMemories() {
     const mem = document.createElement('div');
     mem.className = 'memory';
     if (p) {
-      const photoIndex = start + i;
       mem.innerHTML = `
-        <button class="delete-btn" onclick="deletePhoto(${photoIndex})">×</button>
+        <button class="delete-btn" onclick="deletePhoto(${p.id})">×</button>
         <img src="${p.src}">
         <div class="caption">${p.caption}</div>
       `;
@@ -114,9 +114,8 @@ function renderMemories() {
     const mem = document.createElement('div');
     mem.className = 'memory';
     if (p) {
-      const photoIndex = start + 4 + i;
       mem.innerHTML = `
-        <button class="delete-btn" onclick="deletePhoto(${photoIndex})">×</button>
+        <button class="delete-btn" onclick="deletePhoto(${p.id})">×</button>
         <img src="${p.src}">
         <div class="caption">${p.caption}</div>
       `;
@@ -130,27 +129,19 @@ function renderMemories() {
   book.appendChild(rightPage);
 }
 
-
-function deletePhoto(index) {
-  deleteIndex = index;
+async function deletePhoto(id) {
+  deleteId = id;
   document.getElementById('confirmModal').style.display = 'flex';
 }
 
 async function confirmDelete() {
-  if (deleteIndex !== null) {
-    const photo = photos[deleteIndex];
-    const { error } = await supabase.from("photos").delete().eq("id", photo.id);
-    if (error) {
-      alert("Failed to delete photo.");
-      console.error(error);
-    } else {
-      await loadPhotos();
-    }
-    deleteIndex = null;
+  if (deleteId !== null) {
+    await supabase.from("photos").delete().eq("id", deleteId);
+    deleteId = null;
+    await renderMemories();
   }
   closeModal();
 }
-
 
 function closeModal() {
   document.getElementById('confirmModal').style.display = 'none';
@@ -161,7 +152,7 @@ function closeSuccessModal() {
 }
 
 function changePage(delta) {
-  const maxPage = Math.floor((photos.length - 1) / 8);
+  const maxPage = Math.floor((allPhotos.length - 1) / 8);
   currentPage = Math.min(Math.max(currentPage + delta, 0), maxPage);
   renderMemories();
 }

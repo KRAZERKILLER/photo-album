@@ -38,14 +38,14 @@ function savePhoto() {
       note.style.display = "block";
     }
 
-    document.getElementById('successModal').style.display = 'flex';
+    document.getElementById('successModal').style.display = 'flex'; // ✅ Replaces alert
   };
 
   reader.readAsDataURL(photoInput.files[0]);
 }
 
 function renderMemories() {
-  photos = JSON.parse(localStorage.getItem('scrapbookPhotos') || '[]');
+  photos = JSON.parse(localStorage.getItem('scrapbookPhotos') || '[]'); // ✅ fix added
   const book = document.getElementById('book');
   const noPhotoMsg = document.getElementById('no-photo');
 

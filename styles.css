@@ -1,142 +1,31 @@
 body {
   margin: 0;
-  font-family: 'Cardo', serif;
-  background: #f5f4f0 url('https://www.transparenttextures.com/patterns/paper-fibers.png');
-  color: #2d2d2d;
-}
-
-.page {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  padding: 20px;
-  transition: opacity 0.5s ease;
-  overflow-y: auto;
-}
-
-.hidden {
-  display: none;
-}
-
-.cover-content {
-  text-align: center;
-  background: #dfe4d9;
-  padding: 40px;
-  border: 2px solid #5c5c3d;
-  box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
-  border-radius: 10px;
-  position: relative;
-  width: 90%;
-  max-width: 500px;
-}
-
-.cover-content h1 {
-  font-family: 'Zeyada', cursive;
-  font-size: 3em;
-  color: #3b4a2f;
-}
-
-.cover-content p {
-  margin-top: 10px;
-  font-size: 1.2em;
-}
-
-.cover-content .buttons button {
-  margin: 15px;
-  padding: 12px 24px;
-  background: #3b4a2f;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-size: 1em;
-  cursor: pointer;
-}
-
-.cover-content .buttons button:hover {
-  background: #5a6e44;
-}
-
-.book-straps::before,
-.book-straps::after {
-  content: "";
-  position: absolute;
-  width: 20px;
-  height: 60px;
-  background: #3b4a2f;
-  top: 10px;
-  border-radius: 4px;
-}
-
-.book-straps::before {
-  left: 10px;
-}
-
-.book-straps::after {
-  right: 10px;
-}
-
-.upload-box {
-  background: #dfe4d9;
-  padding: 30px;
-  border: 2px solid #5c5c3d;
-  border-radius: 10px;
-  text-align: center;
-  width: 90%;
-  max-width: 350px;
-}
-
-.upload-box h2 {
-  margin-bottom: 10px;
-}
-
-.upload-box input[type="file"],
-.upload-box input[type="text"] {
-  width: 100%;
-  margin: 10px 0;
-  padding: 8px;
-  font-family: inherit;
-}
-
-.upload-box button {
-  padding: 10px 20px;
-  background: #3b4a2f;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-.back-btn {
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  font-size: 1.5em;
-  cursor: pointer;
-}
-
-#book-container {
-  position: relative;
-  width: 95%;
-  max-width: 900px;
-  height: auto;
-  min-height: 400px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #e5e4dc;
+  overflow-x: hidden;
 }
 
 .book {
   display: flex;
   flex-direction: row;
-  flex-wrap: wrap;
-  width: 100%;
-  border: 2px solid #5c5c3d;
-  box-shadow: inset 0 0 15px rgba(0,0,0,0.1), -5px 0 10px rgba(0,0,0,0.05), 5px 0 10px rgba(0,0,0,0.05);
-  background: #fefefc;
+  justify-content: center;
+  align-items: center;
+  margin: 50px auto;
+  max-width: 1000px;
+  background: #f8f7f2;
+  box-shadow: 0 0 20px rgba(0,0,0,0.1);
+  border: 1px solid #ddd;
+  border-radius: 8px;
   overflow: hidden;
-  position: relative;
+}
+
+.page {
+  width: 100%;
+  height: auto;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  background: url('background-paper.jpg') repeat;
 }
 
 .page-side {
@@ -147,148 +36,167 @@ body {
   gap: 15px;
   border-right: 1px solid rgba(0,0,0,0.1);
   min-width: 300px;
+  scroll-snap-align: start;
 }
 
 .page-side:last-child {
   border-right: none;
 }
 
-.memory {
+.photo-container {
   position: relative;
-  background: white;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  border-radius: 8px;
   overflow: hidden;
-  padding: 10px;
-  min-height: 200px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
-.memory img {
+.photo-container img {
   width: 100%;
   height: auto;
-  border-radius: 5px;
+  display: block;
+  border-radius: 8px;
 }
 
-.caption {
-  font-family: 'Zeyada', cursive;
-  padding: 5px 10px;
-  font-size: 1em;
-  text-align: center;
-  color: #333;
-  margin-top: 8px;
-}
-
-.no-photo {
+.remove-photo {
   position: absolute;
+  top: 5px;
+  right: 5px;
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.cover-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 400px;
+  background: url('cover.jpg') center/cover no-repeat;
+  color: #fff;
   text-align: center;
-  top: 50%;
-  transform: translateY(-50%);
+  flex-direction: column;
+}
+
+.cover-content h1 {
+  font-size: 3em;
+  margin-bottom: 10px;
+}
+
+.cover-content p {
   font-size: 1.2em;
-  color: #777;
+  font-weight: 300;
+}
+
+.upload-box {
+  border: 2px dashed #ccc;
+  padding: 30px;
+  text-align: center;
+  cursor: pointer;
+  color: #999;
+  border-radius: 10px;
+}
+
+.upload-box:hover {
+  background-color: #f0f0f0;
+}
+
+#book-container {
+  position: relative;
+  width: 95%;
+  max-width: 1000px;
+  height: auto;
+  min-height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
 }
 
 #prevPage, #nextPage {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  background: #3b4a2f;
+  background: #3a4427;
   color: white;
   border: none;
+  border-radius: 4px;
   font-size: 2em;
-  cursor: pointer;
-  padding: 5px 15px;
-  border-radius: 5px;
-  z-index: 5;
-}
-
-#prevPage { left: -25px; }
-#nextPage { right: -25px; }
-
-.delete-btn {
-  position: absolute;
-  top: 6px;
-  right: 6px;
-  background: #444;
-  color: #fff;
-  border: none;
-  border-radius: 50%;
-  width: 22px;
-  height: 22px;
-  font-size: 16px;
-  line-height: 20px;
+  padding: 5px 12px;
   cursor: pointer;
   z-index: 10;
 }
 
-.upload-note {
-  margin-top: 10px;
-  font-size: 13px;
-  color: #555;
-  font-style: italic;
-  text-align: center;
+#prevPage {
+  left: -10px;
 }
 
-.empty-slot {
-  width: 100%;
-  height: 100%;
-  background: transparent;
+#nextPage {
+  right: -10px;
 }
 
-/* Modal styling */
+/* Modal */
 .modal {
   display: none;
   position: fixed;
-  z-index: 1000;
+  z-index: 999;
   left: 0;
   top: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0,0,0,0.5);
-  align-items: center;
-  justify-content: center;
-  padding: 10px;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.6);
 }
 
 .modal-content {
-  background: #fefefc;
+  background-color: #fefefe;
+  margin: 15% auto;
   padding: 20px;
-  border: 2px solid #3b4a2f;
-  border-radius: 10px;
+  border: 1px solid #888;
+  width: 80%;
+  max-width: 300px;
   text-align: center;
-  font-family: 'Cardo', serif;
-  box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-  width: 100%;
-  max-width: 400px;
+  border-radius: 8px;
 }
 
-.modal-buttons {
-  margin-top: 15px;
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
 }
 
-.modal-buttons button {
-  padding: 8px 16px;
-  margin: 0 10px;
-  font-family: inherit;
-  border: none;
-  border-radius: 6px;
-  background: #3b4a2f;
-  color: white;
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
   cursor: pointer;
-  transition: background 0.3s;
 }
 
-.modal-buttons button:hover {
-  background: #5a6e44;
-}
-
-/* Extra mobile tweaks */
+/* ✅ Mobile - keep layout */
 @media (max-width: 768px) {
-  .page-side {
-    grid-template-columns: repeat(2, 1fr); /* Keep 2 columns even on mobile */
-    padding: 10px;
+  .book {
+    flex-direction: row;
+    flex-wrap: nowrap;
   }
-}
+
+  #book-container {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+  }
+
+  .page-side {
+    grid-template-columns: repeat(2, 1fr);
+    padding: 15px;
+    min-width: 300px;
+  }
 
   #prevPage, #nextPage {
     font-size: 1.5em;

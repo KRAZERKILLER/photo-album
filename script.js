@@ -13,19 +13,27 @@ function savePhoto() {
   const captionInput = document.getElementById("captionInput");
   const note = document.getElementById("upload-note");
 
-  if (!photoInput.files.length) {
+  const file = photoInput.files[0];
+  if (!file) {
     alert("Please select a photo.");
     return;
   }
 
-  const reader = new FileReader();
-  reader.onload = function (e) {
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("upload_preset", "scrapbook_upload"); // your preset
+
+  fetch("https://api.cloudinary.com/v1_1/djioitxex/image/upload", {
+    method: "POST",
+    body: formData
+  })
+  .then(res => res.json())
+  .then(data => {
     const photo = {
-      src: e.target.result,
+      src: data.secure_url,
       caption: captionInput.value.trim()
     };
 
-    let photos = JSON.parse(localStorage.getItem("scrapbookPhotos") || "[]");
     photos.push(photo);
     localStorage.setItem("scrapbookPhotos", JSON.stringify(photos));
 
@@ -38,10 +46,12 @@ function savePhoto() {
       note.style.display = "block";
     }
 
-    document.getElementById('successModal').style.display = 'flex'; // ✅ Replaces alert
-  };
-
-  reader.readAsDataURL(photoInput.files[0]);
+    document.getElementById('successModal').style.display = 'flex';
+  })
+  .catch(err => {
+    alert("Upload failed. Please try again.");
+    console.error(err);
+  });
 }
 
 function renderMemories() {

@@ -15,7 +15,7 @@
       <h1>Our Love Scrapbook</h1>
       <p>Every photo tells a piece of our story 💌</p>
       <div class="buttons">
-        <button id="cloudinary-upload" onclick="openUploadWidget()">Upload Photo</button>
+        <button onclick="goToPage('upload')">📤 Upload Photo</button>
         <button onclick="goToPage('memories')">📖 See Memories</button>
       </div>
     </div>
@@ -27,14 +27,7 @@
       <h2>Upload a Memory</h2>
       <input type="file" id="photoInput" accept="image/*"><br>
       <input type="text" id="captionInput" placeholder="Add a caption..."><br>
-      <button 
-        id="uploadBtn" 
-        data-upload-preset="our_scrapbook" 
-        data-cloud-name="djioitxex" 
-        onclick="savePhoto()"
-      >
-        Save to Scrapbook
-      </button>
+      <button onclick="savePhoto()">Save to Scrapbook</button>
       <p id="upload-note" class="upload-note">📌 <em>Upload at least 4 photos to unlock the next scrapbook page.</em></p>
     </div>
   </div>

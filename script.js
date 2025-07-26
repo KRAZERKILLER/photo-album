@@ -1,14 +1,19 @@
-let photos = JSON.parse(localStorage.getItem('scrapbookPhotos') || '[]');
+// Initialize Supabase
+const SUPABASE_URL = 'https://djhsduwbtxwqxunxfryf.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRqaHNkdXdidHh3cXh1bnhmcnlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM1NDI1NzIsImV4cCI6MjA2OTExODU3Mn0.oiy4qTjQhPZC495z3ZSGTsFFu4dDbHFDqzoQRb9d6tw';
+const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let photos = [];
 let currentPage = 0;
 let deleteIndex = null;
 
 function goToPage(page) {
   document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
   document.getElementById(`${page}-page`).classList.remove('hidden');
-  if (page === 'memories') renderMemories();
+  if (page === 'memories') loadPhotos();
 }
 
-function savePhoto() {
+async function savePhoto() {
   const photoInput = document.getElementById("photoInput");
   const captionInput = document.getElementById("captionInput");
   const note = document.getElementById("upload-note");
@@ -21,41 +26,45 @@ function savePhoto() {
 
   const formData = new FormData();
   formData.append("file", file);
-  formData.append("upload_preset", "scrapbook_upload"); // your preset
+  formData.append("upload_preset", "scrapbook_upload");
 
-  fetch("https://api.cloudinary.com/v1_1/djioitxex/image/upload", {
-    method: "POST",
-    body: formData
-  })
-  .then(res => res.json())
-  .then(data => {
-    const photo = {
-      src: data.secure_url,
-      caption: captionInput.value.trim()
-    };
+  try {
+    const res = await fetch("https://api.cloudinary.com/v1_1/djioitxex/image/upload", {
+      method: "POST",
+      body: formData
+    });
 
-    photos.push(photo);
-    localStorage.setItem("scrapbookPhotos", JSON.stringify(photos));
+    const data = await res.json();
+    const imageUrl = data.secure_url;
+    const caption = captionInput.value.trim();
+
+    // Insert into Supabase
+    const { error } = await supabase.from("photos").insert([{ src: imageUrl, caption }]);
+    if (error) throw error;
 
     captionInput.value = "";
     photoInput.value = "";
-
-    if (photos.length >= 4) {
-      note.style.display = "none";
-    } else {
-      note.style.display = "block";
-    }
-
     document.getElementById('successModal').style.display = 'flex';
-  })
-  .catch(err => {
-    alert("Upload failed. Please try again.");
+
+    loadPhotos(); // Refresh photos
+  } catch (err) {
     console.error(err);
-  });
+    alert("Upload failed.");
+  }
+}
+
+
+async function loadPhotos() {
+  const { data, error } = await supabase.from("photos").select("*").order("id", { ascending: true });
+  if (error) {
+    console.error(error);
+    return;
+  }
+  photos = data || [];
+  renderMemories();
 }
 
 function renderMemories() {
-  photos = JSON.parse(localStorage.getItem('scrapbookPhotos') || '[]'); // ✅ fix added
   const book = document.getElementById('book');
   const noPhotoMsg = document.getElementById('no-photo');
 
@@ -121,22 +130,27 @@ function renderMemories() {
   book.appendChild(rightPage);
 }
 
+
 function deletePhoto(index) {
   deleteIndex = index;
   document.getElementById('confirmModal').style.display = 'flex';
 }
 
-function confirmDelete() {
+async function confirmDelete() {
   if (deleteIndex !== null) {
-    photos.splice(deleteIndex, 1);
-    localStorage.setItem('scrapbookPhotos', JSON.stringify(photos));
-    const maxPage = Math.floor((photos.length - 1) / 8);
-    if (currentPage > maxPage) currentPage = maxPage;
-    renderMemories();
+    const photo = photos[deleteIndex];
+    const { error } = await supabase.from("photos").delete().eq("id", photo.id);
+    if (error) {
+      alert("Failed to delete photo.");
+      console.error(error);
+    } else {
+      await loadPhotos();
+    }
     deleteIndex = null;
   }
   closeModal();
 }
+
 
 function closeModal() {
   document.getElementById('confirmModal').style.display = 'none';

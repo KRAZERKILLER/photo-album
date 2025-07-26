@@ -54,7 +54,6 @@ function renderMemories() {
     book.innerHTML = '';
     return;
   }
-
   noPhotoMsg.style.display = 'none';
 
   const start = currentPage * 8;

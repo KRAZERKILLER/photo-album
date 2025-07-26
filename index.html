@@ -63,16 +63,16 @@
     </div>
   </div>
   
- <!-- Supabase CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.42.3/+esm"></script>
+ <!-- ✅ Only this version -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 
-  <script>
-    const SUPABASE_URL = "https://djhsudwbtxwqunxfryf.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRqaHNkdXdidHh3cXh1bnhmcnlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM1NDI1NzIsImV4cCI6MjA2OTExODU3Mn0.oiy4qTjQhPZC495z3ZSGTsFFu4dDbHFDqzoQRb9d6tw";
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  </script>
-  
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-  <script src="script.js"></script>
+<script>
+  const SUPABASE_URL = "https://djhsudwbtxwqunxfryf.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRqaHNkdXdidHh3cXh1bnhmcnlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM1NDI1NzIsImV4cCI6MjA2OTExODU3Mn0.oiy4qTjQhPZC495z3ZSGTsFFu4dDbHFDqzoQRb9d6tw";
+  const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+</script>
+
+<script src="script.js"></script>
+
 </body>
 </html>

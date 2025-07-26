@@ -285,9 +285,10 @@ body {
 /* Extra mobile tweaks */
 @media (max-width: 768px) {
   .page-side {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr); /* Keep 2 columns even on mobile */
     padding: 10px;
   }
+}
 
   #prevPage, #nextPage {
     font-size: 1.5em;

@@ -141,3 +141,46 @@ function changePage(delta) {
   currentPage = Math.min(Math.max(currentPage + delta, 0), maxPage);
   renderMemories();
 }
+
+/* ✅ CLOUDINARY Upload Integration (INSERTED ONLY — your original code remains untouched) */
+document.getElementById('cloudinary-upload').addEventListener('click', function () {
+  cloudinary.openUploadWidget(
+    {
+      cloudName: 'djioitxex',
+      uploadPreset: 'preset1',
+      sources: ['local', 'url', 'camera'],
+      multiple: false,
+      folder: 'scrapbook',
+      cropping: false,
+      resourceType: 'image',
+      maxFileSize: 2000000,
+      clientAllowedFormats: ['jpg', 'jpeg', 'png', 'gif']
+    },
+    function (error, result) {
+      if (!error && result && result.event === "success") {
+        const uploadedUrl = result.info.secure_url;
+        const captionInput = document.getElementById("captionInput");
+        const note = document.getElementById("upload-note");
+
+        const photo = {
+          src: uploadedUrl,
+          caption: captionInput.value.trim()
+        };
+
+        let photos = JSON.parse(localStorage.getItem("scrapbookPhotos") || "[]");
+        photos.push(photo);
+        localStorage.setItem("scrapbookPhotos", JSON.stringify(photos));
+
+        captionInput.value = "";
+
+        if (photos.length >= 4) {
+          note.style.display = "none";
+        } else {
+          note.style.display = "block";
+        }
+
+        document.getElementById('successModal').style.display = 'flex';
+      }
+    }
+  );
+});

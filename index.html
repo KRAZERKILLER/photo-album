@@ -27,7 +27,14 @@
       <h2>Upload a Memory</h2>
       <input type="file" id="photoInput" accept="image/*"><br>
       <input type="text" id="captionInput" placeholder="Add a caption..."><br>
-      <button onclick="savePhoto()">Save to Scrapbook</button>
+      <button 
+        id="uploadBtn" 
+        data-upload-preset="our_scrapbook" 
+        data-cloud-name="YOUR_CLOUD_NAME" 
+        onclick="savePhoto()"
+      >
+        Save to Scrapbook
+      </button>
       <p id="upload-note" class="upload-note">📌 <em>Upload at least 4 photos to unlock the next scrapbook page.</em></p>
     </div>
   </div>

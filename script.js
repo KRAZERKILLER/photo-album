@@ -139,5 +139,3 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById('successOkayBtn')?.addEventListener('click', closeSuccessModal);
   document.getElementById('confirmDeleteBtn')?.addEventListener('click', confirmDelete);
 });
-
-});

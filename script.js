@@ -1,4 +1,3 @@
-// ✅ Correct Supabase initialization (v2)
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
 const SUPABASE_URL = 'https://djhsduwbtxwqunxfryf.supabase.co';
@@ -10,18 +9,13 @@ let currentPage = 0;
 let allPhotos = [];
 let deleteId = null;
 
-function setupNavigation() {
-  document.getElementById("upload-btn").addEventListener("click", () => goToPage("upload"));
-  document.getElementById("memories-btn").addEventListener("click", () => goToPage("memories"));
-}
-
-window.goToPage = async function (page) {
+function goToPage(page) {
   document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
   document.getElementById(`${page}-page`).classList.remove('hidden');
-  if (page === 'memories') await renderMemories();
-};
+  if (page === 'memories') renderMemories();
+}
 
-window.savePhoto = async function () {
+async function savePhoto() {
   const photoInput = document.getElementById("photoInput");
   const captionInput = document.getElementById("captionInput");
   const file = photoInput.files[0];
@@ -50,7 +44,7 @@ window.savePhoto = async function () {
     alert("Upload failed.");
     console.error(err);
   }
-};
+}
 
 async function renderMemories() {
   const { data, error } = await supabase.from("photos").select("*").order("id", { ascending: true });
@@ -92,7 +86,7 @@ function createMemory(photo) {
   mem.className = "memory";
   if (photo) {
     mem.innerHTML = `
-      <button class="delete-btn" onclick="deletePhoto(${photo.id})">×</button>
+      <button class="delete-btn" data-id="${photo.id}">×</button>
       <img src="${photo.src}" />
       <div class="caption">${photo.caption}</div>
     `;
@@ -102,32 +96,46 @@ function createMemory(photo) {
   return mem;
 }
 
-window.deletePhoto = async function (id) {
+function deletePhoto(id) {
   deleteId = id;
   document.getElementById("confirmModal").style.display = "flex";
-};
+}
 
-window.confirmDelete = async function () {
+async function confirmDelete() {
   if (deleteId !== null) {
     await supabase.from("photos").delete().eq("id", deleteId);
     deleteId = null;
-    await renderMemories();
+    renderMemories();
   }
   closeModal();
-};
+}
 
-window.closeModal = function () {
+function closeModal() {
   document.getElementById("confirmModal").style.display = "none";
-};
+}
 
-window.closeSuccessModal = function () {
+function closeSuccessModal() {
   document.getElementById("successModal").style.display = "none";
-};
+}
 
-window.changePage = function (delta) {
+function changePage(delta) {
   const max = Math.floor((allPhotos.length - 1) / 8);
   currentPage = Math.min(Math.max(currentPage + delta, 0), max);
   renderMemories();
-};
+}
 
-window.addEventListener("DOMContentLoaded", setupNavigation);
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("upload-btn").addEventListener("click", () => goToPage("upload"));
+  document.getElementById("memories-btn").addEventListener("click", () => goToPage("memories"));
+  document.getElementById("save-btn").addEventListener("click", savePhoto);
+  document.getElementById("prevPage").addEventListener("click", () => changePage(-1));
+  document.getElementById("nextPage").addEventListener("click", () => changePage(1));
+  document.getElementById("confirmDeleteBtn").addEventListener("click", confirmDelete);
+
+  // Delegate delete buttons
+  document.getElementById("book").addEventListener("click", e => {
+    if (e.target.classList.contains("delete-btn")) {
+      deletePhoto(Number(e.target.dataset.id));
+    }
+  });
+});

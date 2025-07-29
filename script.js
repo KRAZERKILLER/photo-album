@@ -2,7 +2,6 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 
 const SUPABASE_URL = 'https://djhsduwbtxwqunxfryf.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRqaHNkdXdidHh3cXh1bnhmcnlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM1NDI1NzIsImV4cCI6MjA2OTExODU3Mn0.oiy4qTjQhPZC495z3ZSGTsFFu4dDbHFDqzoQRb9d6tw';
-
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let currentPage = 0;
@@ -12,7 +11,11 @@ let deleteId = null;
 function goToPage(page) {
   document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
   document.getElementById(`${page}-page`).classList.remove('hidden');
-  if (page === 'memories') renderMemories();
+
+  if (page === 'memories') {
+    currentPage = 0;
+    renderMemories();
+  }
 }
 
 async function savePhoto() {
@@ -32,23 +35,51 @@ async function savePhoto() {
     });
 
     const data = await res.json();
-    const photo = { src: data.secure_url, caption: captionInput.value.trim() };
+    if (!data.secure_url) {
+      alert("Image upload failed.");
+      return;
+    }
 
-    await supabase.from("photos").insert([photo]);
+    const photo = {
+      src: data.secure_url,
+      caption: captionInput.value.trim()
+    };
+
+    const { error } = await supabase.from("photos").insert([photo]);
+    if (error) {
+      alert("Saving to Supabase failed.");
+      console.error("Supabase insert error:", error);
+      return;
+    }
 
     captionInput.value = "";
     photoInput.value = "";
 
+    // Show success modal first
     document.getElementById('successModal').style.display = 'flex';
+
+    // After short delay, go to memories page
+    setTimeout(() => {
+      document.getElementById('successModal').style.display = 'none';
+      goToPage('memories');
+    }, 1500);
+
   } catch (err) {
     alert("Upload failed.");
-    console.error(err);
+    console.error("Upload error:", err);
   }
 }
 
 async function renderMemories() {
   const { data, error } = await supabase.from("photos").select("*").order("id", { ascending: true });
-  if (error) return console.error("Error loading photos:", error);
+
+  if (error) {
+    console.error("Error loading photos:", error);
+    alert("Could not load memories.");
+    return;
+  }
+
+  console.log("Loaded photos:", data);
 
   allPhotos = data;
   const book = document.getElementById("book");
@@ -84,15 +115,17 @@ async function renderMemories() {
 function createMemory(photo) {
   const mem = document.createElement("div");
   mem.className = "memory";
-  if (photo) {
+
+  if (photo && photo.src) {
     mem.innerHTML = `
       <button class="delete-btn" data-id="${photo.id}">×</button>
-      <img src="${photo.src}" />
+      <img src="${photo.src}" alt="Memory image" />
       <div class="caption">${photo.caption}</div>
     `;
   } else {
     mem.innerHTML = `<div class="empty-slot"></div>`;
   }
+
   return mem;
 }
 
@@ -138,4 +171,12 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById('cancelDeleteBtn')?.addEventListener('click', closeModal);
   document.getElementById('successOkayBtn')?.addEventListener('click', closeSuccessModal);
   document.getElementById('confirmDeleteBtn')?.addEventListener('click', confirmDelete);
+
+  // Memory delete click (delegated)
+  document.addEventListener('click', e => {
+    if (e.target.classList.contains('delete-btn')) {
+      const id = e.target.dataset.id;
+      deletePhoto(id);
+    }
+  });
 });

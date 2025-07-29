@@ -125,17 +125,19 @@ function changePage(delta) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  document.getElementById("upload-btn").addEventListener("click", () => goToPage("upload"));
-  document.getElementById("memories-btn").addEventListener("click", () => goToPage("memories"));
-  document.getElementById("save-btn").addEventListener("click", savePhoto);
-  document.getElementById("prevPage").addEventListener("click", () => changePage(-1));
-  document.getElementById("nextPage").addEventListener("click", () => changePage(1));
-  document.getElementById("confirmDeleteBtn").addEventListener("click", confirmDelete);
-
-  // Delegate delete buttons
-  document.getElementById("book").addEventListener("click", e => {
-    if (e.target.classList.contains("delete-btn")) {
-      deletePhoto(Number(e.target.dataset.id));
-    }
+  document.querySelectorAll('.back-btn').forEach(btn => {
+    btn.addEventListener('click', () => goToPage('cover'));
   });
+
+  document.getElementById('save-btn')?.addEventListener('click', savePhoto);
+  document.getElementById('upload-btn')?.addEventListener('click', () => goToPage('upload'));
+  document.getElementById('memories-btn')?.addEventListener('click', () => goToPage('memories'));
+  document.getElementById('prevPage')?.addEventListener('click', () => changePage(-1));
+  document.getElementById('nextPage')?.addEventListener('click', () => changePage(1));
+
+  document.getElementById('cancelDeleteBtn')?.addEventListener('click', closeModal);
+  document.getElementById('successOkayBtn')?.addEventListener('click', closeSuccessModal);
+  document.getElementById('confirmDeleteBtn')?.addEventListener('click', confirmDelete);
+});
+
 });

@@ -188,7 +188,8 @@ body {
   color: #777;
 }
 
-#prevPage, #nextPage {
+#prevPage,
+#nextPage {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);

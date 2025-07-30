@@ -78,7 +78,6 @@ async function renderMemories() {
     return;
   }
 
-  console.log("Loaded photos:", data);
   allPhotos = data;
 
   const book = document.getElementById("book");
@@ -129,12 +128,14 @@ function createMemory(photo) {
 }
 
 function deletePhoto(id) {
+  console.log("Attempting to delete photo with id:", id);
   deleteId = id;
   document.getElementById("confirmModal").style.display = "flex";
 }
 
 async function confirmDelete() {
   if (deleteId !== null) {
+    console.log("Confirmed delete for id:", deleteId);
     await supabase.from("photos").delete().eq("id", deleteId);
     deleteId = null;
     renderMemories();
@@ -170,11 +171,15 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById('cancelDeleteBtn')?.addEventListener('click', closeModal);
   document.getElementById('successOkayBtn')?.addEventListener('click', closeSuccessModal);
   document.getElementById('confirmDeleteBtn')?.addEventListener('click', confirmDelete);
+});
 
-  document.addEventListener('click', e => {
-    if (e.target.classList.contains('delete-btn')) {
-      const id = e.target.dataset.id;
+// 💡 FIXED: robust delete button event delegation
+document.addEventListener('click', e => {
+  const btn = e.target.closest('.delete-btn');
+  if (btn) {
+    const id = btn.dataset.id;
+    if (id) {
       deletePhoto(id);
     }
-  });
+  }
 });

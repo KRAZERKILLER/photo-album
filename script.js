@@ -1,10 +1,9 @@
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-const supabaseUrl = 'https://ufmmufpulqyhvzvbiipo.supabase.co'
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVmbW11ZnB1bHF5aHZ6dmJpaXBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM4ODAwOTEsImV4cCI6MjA2OTQ1NjA5MX0.RfIlSotJtY5xDRytZag60mYYxF6mR8hnklQwzUR9eY0'
+const supabaseUrl = 'https://ufmmufpulqyhvzvbiipo.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVmbW11ZnB1bHF5aHZ6dmJpaXBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM4ODAwOTEsImV4cCI6MjA2OTQ1NjA5MX0.RfIlSotJtY5xDRytZag60mYYxF6mR8hnklQwzUR9eY0';
 
-const supabase = createClient(supabaseUrl, supabaseKey)
-
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 let currentPage = 0;
 let allPhotos = [];
@@ -57,10 +56,8 @@ async function savePhoto() {
     captionInput.value = "";
     photoInput.value = "";
 
-    // Show success modal first
     document.getElementById('successModal').style.display = 'flex';
 
-    // After short delay, go to memories page
     setTimeout(() => {
       document.getElementById('successModal').style.display = 'none';
       goToPage('memories');
@@ -82,8 +79,8 @@ async function renderMemories() {
   }
 
   console.log("Loaded photos:", data);
-
   allPhotos = data;
+
   const book = document.getElementById("book");
   const noPhotoMsg = document.getElementById("no-photo");
 
@@ -174,7 +171,6 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById('successOkayBtn')?.addEventListener('click', closeSuccessModal);
   document.getElementById('confirmDeleteBtn')?.addEventListener('click', confirmDelete);
 
-  // Memory delete click (delegated)
   document.addEventListener('click', e => {
     if (e.target.classList.contains('delete-btn')) {
       const id = e.target.dataset.id;

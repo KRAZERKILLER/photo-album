@@ -327,7 +327,7 @@ body {
   padding: 2px 4px;
 }
 
-.logout-container {
+.logout-container.fixed-logout {
   position: fixed;
   top: 20px;
   right: 20px;
@@ -335,23 +335,22 @@ body {
 }
 
 .logout-button {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  background-color: #556b2f; /* army green */
-  color: white;
-  border: none;
-  padding: 8px 14px;
-  font-family: 'Cardo', serif;
-  font-size: 14px;
-  border-radius: 5px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  font-family: 'Zeyada', cursive;
+  background-color: #fdfcf9;
+  color: #3b3b3b;
+  border: 2px dashed #aaa;
+  padding: 10px 18px;
+  border-radius: 10px;
+  box-shadow: 4px 4px 8px rgba(0,0,0,0.1);
   cursor: pointer;
-  z-index: 1000;
-  display: none; /* Shown only when logged in */
-  transition: background-color 0.2s ease;
+  transition: all 0.3s ease;
+  transform: rotate(-2deg);
+  font-size: 18px;
+  text-shadow: 1px 1px 0 #fff;
 }
 
 .logout-button:hover {
-  background-color: #445528;
+  background-color: #fffefb;
+  transform: rotate(0deg) scale(1.05);
+  box-shadow: 5px 5px 10px rgba(0,0,0,0.15);
 }

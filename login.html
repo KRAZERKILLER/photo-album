@@ -63,31 +63,16 @@
       color: #c0392b;
       font-size: 14px;
     }
-
-    #logout-button {
-      background-color: #a94442;
-    }
-
-    #logout-button:hover {
-      background-color: #843534;
-    }
   </style>
 </head>
 <body>
-
 <div class="login-container">
   <h2>Welcome Back 💌</h2>
-
   <div id="login-form">
     <input type="email" id="email" placeholder="Email" />
     <input type="password" id="password" placeholder="Password" />
     <button id="login-button">Open Scrapbook</button>
     <p id="login-error"></p>
-  </div>
-
-  <div id="already-logged-in" style="display: none;">
-    <p>You’re already logged in.</p>
-    <button id="logout-button">Logout</button>
   </div>
 </div>
 
@@ -99,16 +84,8 @@
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVmbW11ZnB1bHF5aHZ6dmJpaXBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM4ODAwOTEsImV4cCI6MjA2OTQ1NjA5MX0.RfIlSotJtY5xDRytZag60mYYxF6mR8hnklQwzUR9eY0'
   );
 
-  const loginForm = document.getElementById("login-form");
   const loginError = document.getElementById("login-error");
 
-  // 🚀 Check if already logged in and immediately redirect
-  const { data: { session } } = await supabase.auth.getSession();
-  if (session) {
-    window.location.href = "index.html";
-  }
-
-  // 🎯 Handle login button click
   document.getElementById("login-button").addEventListener("click", async () => {
     const email = document.getElementById("email").value.trim();
     const password = document.getElementById("password").value.trim();
@@ -118,10 +95,19 @@
     if (error) {
       loginError.textContent = "⚠️ " + error.message;
     } else {
-      window.location.href = "index.html"; // ✅ Redirect after login
+      // Delay redirect slightly to prevent flash
+      setTimeout(() => {
+        window.location.href = "index.html";
+      }, 200);
+    }
+  });
+
+  // If already logged in, redirect immediately
+  supabase.auth.getSession().then(({ data: { session } }) => {
+    if (session) {
+      window.location.href = "index.html";
     }
   });
 </script>
-
 </body>
 </html>

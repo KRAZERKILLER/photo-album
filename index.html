@@ -66,27 +66,31 @@
     </div>
   </div>
 
-  <!-- Supabase Logout Logic -->
-  <script type="module">
-  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+<!-- Supabase Logout Logic -->
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-  const supabase = createClient(
-    'https://ufmmufpulqyhvzvbiipo.supabase.co',
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVmbW11ZnB1bHF5aHZ6dmJpaXBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM4ODAwOTEsImV4cCI6MjA2OTQ1NjA5MX0.RfIlSotJtY5xDRytZag60mYYxF6mR8hnklQwzUR9eY0'
-  );
+const supabase = createClient(
+  'https://ufmmufpulqyhvzvbiipo.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVmbW11ZnB1bHF5aHZ6dmJpaXBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM4ODAwOTEsImV4cCI6MjA2OTQ1NjA5MX0.RfIlSotJtY5xDRytZag60mYYxF6mR8hnklQwzUR9eY0'
+);
 
-  const logoutButton = document.getElementById("logout-button");
+const logoutButton = document.getElementById("logout-btn");
+const logoutContainer = document.getElementById("logout-container");
 
-  supabase.auth.getSession().then(({ data: { session } }) => {
-    if (!session) {
-      window.location.href = "login.html";
-    }
-  });
-
-  logoutButton?.addEventListener("click", async () => {
-    await supabase.auth.signOut();
+supabase.auth.getSession().then(({ data: { session } }) => {
+  if (!session) {
     window.location.href = "login.html";
-  });
+  } else {
+    // Show logout button if logged in
+    logoutContainer.style.display = "block";
+  }
+});
+
+logoutButton?.addEventListener("click", async () => {
+  await supabase.auth.signOut();
+  window.location.href = "login.html";
+});
 </script>
 
   <script type="module" src="script.js" defer></script>

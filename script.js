@@ -6,18 +6,22 @@ const supabase = createClient(
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVmbW11ZnB1bHF5aHZ6dmJpaXBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM4ODAwOTEsImV4cCI6MjA2OTQ1NjA5MX0.RfIlSotJtY5xDRytZag60mYYxF6mR8hnklQwzUR9eY0'
 );
 
-// --- Auth Redirect Logic ---
-const { data: { session } } = await supabase.auth.getSession();
-const isOnLoginPage = location.pathname.endsWith("login.html");
+// --- Auth Check ---
+document.addEventListener("DOMContentLoaded", async () => {
+  const { data: { session } } = await supabase.auth.getSession();
+  const onLoginPage = location.pathname.endsWith("login.html");
 
-if (!session && !isOnLoginPage) {
-  window.location.href = "login.html";
-} else if (session && isOnLoginPage) {
-  window.location.href = "index.html";
-}
+  if (!session && !onLoginPage) {
+    window.location.href = "login.html";
+    return;
+  }
 
-// --- Logout Button on Cover Page ---
-document.addEventListener("DOMContentLoaded", () => {
+  if (session && onLoginPage) {
+    window.location.href = "index.html";
+    return;
+  }
+
+  // Logout button visibility
   const logoutBtn = document.getElementById("logout-btn");
   if (logoutBtn) {
     logoutBtn.style.display = session ? "block" : "none";
@@ -26,8 +30,13 @@ document.addEventListener("DOMContentLoaded", () => {
       window.location.href = "login.html";
     });
   }
+
+  // Only attach scrapbook events if on index.html
+  if (!onLoginPage) initScrapbook();
 });
 
+
+// --- Scrapbook Functions ---
 let currentPage = 0;
 let allPhotos = [];
 let deleteId = null;
@@ -40,6 +49,58 @@ function goToPage(page) {
     currentPage = 0;
     renderMemories();
   }
+}
+
+function initScrapbook() {
+  document.querySelectorAll('.back-btn').forEach(btn => {
+    btn.addEventListener('click', () => goToPage('cover'));
+  });
+
+  document.getElementById('upload-btn')?.addEventListener('click', () => goToPage('upload'));
+  document.getElementById('memories-btn')?.addEventListener('click', () => goToPage('memories'));
+  document.getElementById('save-btn')?.addEventListener('click', savePhoto);
+  document.getElementById('prevPage')?.addEventListener('click', () => changePage(-1));
+  document.getElementById('nextPage')?.addEventListener('click', () => changePage(1));
+  document.getElementById('cancelDeleteBtn')?.addEventListener('click', closeModal);
+  document.getElementById('successOkayBtn')?.addEventListener('click', closeSuccessModal);
+  document.getElementById('confirmDeleteBtn')?.addEventListener('click', confirmDelete);
+
+  document.addEventListener('click', async e => {
+    const delBtn = e.target.closest('.delete-btn');
+    const editBtn = e.target.closest('.edit-btn');
+    const saveBtn = e.target.closest('.save-caption-btn');
+
+    if (delBtn) {
+      const id = delBtn.dataset.id;
+      deletePhoto(id);
+    }
+
+    if (editBtn) {
+      const id = editBtn.dataset.id;
+      const captionDiv = document.querySelector(`.caption[data-id="${id}"]`);
+      const saveButton = document.querySelector(`.save-caption-btn[data-id="${id}"]`);
+      captionDiv.contentEditable = true;
+      captionDiv.focus();
+      saveButton.classList.remove("hidden");
+      editBtn.classList.add("hidden");
+    }
+
+    if (saveBtn) {
+      const id = saveBtn.dataset.id;
+      const captionDiv = document.querySelector(`.caption[data-id="${id}"]`);
+      const newCaption = captionDiv.innerText.trim();
+
+      const { error } = await supabase.from("photos").update({ caption: newCaption }).eq("id", id);
+      if (error) {
+        alert("Failed to update caption.");
+        return;
+      }
+
+      captionDiv.contentEditable = false;
+      saveBtn.classList.add("hidden");
+      document.querySelector(`.edit-btn[data-id="${id}"]`).classList.remove("hidden");
+    }
+  });
 }
 
 async function savePhoto() {
@@ -178,57 +239,3 @@ function changePage(delta) {
   currentPage = Math.min(Math.max(currentPage + delta, 0), max);
   renderMemories();
 }
-
-document.addEventListener("DOMContentLoaded", () => {
-  document.querySelectorAll('.back-btn').forEach(btn => {
-    btn.addEventListener('click', () => goToPage('cover'));
-  });
-
-  document.getElementById('save-btn')?.addEventListener('click', savePhoto);
-  document.getElementById('upload-btn')?.addEventListener('click', () => goToPage('upload'));
-  document.getElementById('memories-btn')?.addEventListener('click', () => goToPage('memories'));
-  document.getElementById('prevPage')?.addEventListener('click', () => changePage(-1));
-  document.getElementById('nextPage')?.addEventListener('click', () => changePage(1));
-
-  document.getElementById('cancelDeleteBtn')?.addEventListener('click', closeModal);
-  document.getElementById('successOkayBtn')?.addEventListener('click', closeSuccessModal);
-  document.getElementById('confirmDeleteBtn')?.addEventListener('click', confirmDelete);
-});
-
-// Event delegation for edit/delete buttons
-document.addEventListener('click', async e => {
-  const delBtn = e.target.closest('.delete-btn');
-  const editBtn = e.target.closest('.edit-btn');
-  const saveBtn = e.target.closest('.save-caption-btn');
-
-  if (delBtn) {
-    const id = delBtn.dataset.id;
-    deletePhoto(id);
-  }
-
-  if (editBtn) {
-    const id = editBtn.dataset.id;
-    const captionDiv = document.querySelector(`.caption[data-id="${id}"]`);
-    const saveButton = document.querySelector(`.save-caption-btn[data-id="${id}"]`);
-    captionDiv.contentEditable = true;
-    captionDiv.focus();
-    saveButton.classList.remove("hidden");
-    editBtn.classList.add("hidden");
-  }
-
-  if (saveBtn) {
-    const id = saveBtn.dataset.id;
-    const captionDiv = document.querySelector(`.caption[data-id="${id}"]`);
-    const newCaption = captionDiv.innerText.trim();
-
-    const { error } = await supabase.from("photos").update({ caption: newCaption }).eq("id", id);
-    if (error) {
-      alert("Failed to update caption.");
-      return;
-    }
-
-    captionDiv.contentEditable = false;
-    saveBtn.classList.add("hidden");
-    document.querySelector(`.edit-btn[data-id="${id}"]`).classList.remove("hidden");
-  }
-});

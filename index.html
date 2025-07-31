@@ -6,8 +6,6 @@
   <title>Our Love Scrapbook</title>
   <link rel="stylesheet" href="styles.css"/>
   <link href="https://fonts.googleapis.com/css2?family=Zeyada&family=Cardo&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js" defer></script>
-  <script type="module" src="script.js" defer></script>
 </head>
 <body>
 
@@ -20,7 +18,7 @@
         <button id="upload-btn">📤 Upload Photo</button>
         <button id="memories-btn">📖 See Memories</button>
       </div>
-      <div class="logout-container hidden" id="logout-container">
+      <div id="logout-container" class="logout-container" style="display: none;">
         <button id="logout-button">🚪 Logout</button>
       </div>
     </div>
@@ -66,5 +64,32 @@
     </div>
   </div>
 
+  <!-- Supabase Logout Logic -->
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
+    const SUPABASE_URL = 'https://ufmmufpulqvhyvzvbiipo.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVmbW11ZnB1bHF5aHZ6dmJpaXBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM4ODAwOTEsImV4cCI6MjA2OTQ1NjA5MX0.RfIlSotJtY5xDRytZag60mYYxF6mR8hnklQwzUR9eY0';
+    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const logoutButton = document.getElementById("logout-button");
+    const logoutContainer = document.getElementById("logout-container");
+
+    const { data: { session } } = await supabase.auth.getSession();
+
+    if (session) {
+      logoutContainer.style.display = "block";
+    } else {
+      window.location.href = "login.html";
+    }
+
+    logoutButton.addEventListener("click", async () => {
+      await supabase.auth.signOut();
+      window.location.href = "login.html";
+    });
+  </script>
+
+  <!-- Your App Logic -->
+  <script type="module" src="script.js" defer></script>
 </body>
 </html>

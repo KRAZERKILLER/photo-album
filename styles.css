@@ -311,3 +311,19 @@ body {
     font-size: 14px;
   }
 }
+.caption-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 5px;
+}
+
+.save-caption-btn.hidden {
+  display: none;
+}
+
+.caption[contenteditable="true"] {
+  border-bottom: 1px dashed #aaa;
+  padding: 2px 4px;
+}
+

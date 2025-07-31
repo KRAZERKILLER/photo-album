@@ -1,5 +1,14 @@
-// --- Login Check ---
-if (!localStorage.getItem("isLoggedIn")) {
+// --- Supabase Auth Setup ---
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
+const supabase = createClient(
+  'https://ufmmufpulqyhvzvbiipo.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVmbW11ZnB1bHF5aHZ6dmJpaXBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM4ODAwOTEsImV4cCI6MjA2OTQ1NjA5MX0.RfIlSotJtY5xDRytZag60mYYxF6mR8hnklQwzUR9eY0'
+);
+
+// --- Auth Check ---
+const { data: { session } } = await supabase.auth.getSession();
+if (!session) {
   if (!location.pathname.endsWith("login.html")) {
     window.location.href = "login.html";
   }
@@ -9,19 +18,13 @@ if (!localStorage.getItem("isLoggedIn")) {
 document.addEventListener("DOMContentLoaded", () => {
   const logoutBtn = document.getElementById("logout-btn");
   if (logoutBtn) {
-    logoutBtn.style.display = localStorage.getItem("isLoggedIn") ? "block" : "none";
-    logoutBtn.addEventListener("click", () => {
-      localStorage.removeItem("isLoggedIn");
+    logoutBtn.style.display = session ? "block" : "none";
+    logoutBtn.addEventListener("click", async () => {
+      await supabase.auth.signOut();
       window.location.href = "login.html";
     });
   }
 });
-
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
-
-const supabaseUrl = 'https://ufmmufpulqyhvzvbiipo.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVmbW11ZnB1bHF5aHZ6dmJpaXBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM4ODAwOTEsImV4cCI6MjA2OTQ1NjA5MX0.RfIlSotJtY5xDRytZag60mYYxF6mR8hnklQwzUR9eY0';
-const supabase = createClient(supabaseUrl, supabaseKey);
 
 let currentPage = 0;
 let allPhotos = [];
@@ -190,7 +193,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById('confirmDeleteBtn')?.addEventListener('click', confirmDelete);
 });
 
-// Event delegation for dynamic elements
+// Event delegation for edit/delete buttons
 document.addEventListener('click', async e => {
   const delBtn = e.target.closest('.delete-btn');
   const editBtn = e.target.closest('.edit-btn');

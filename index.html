@@ -8,12 +8,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Zeyada&family=Cardo&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js" defer></script>
   <script type="module" src="script.js" defer></script>
-  <script>
-    // Redirect to login if not authenticated
-    if (localStorage.getItem("isLoggedIn") !== "true") {
-      window.location.href = "login.html";
-    }
-  </script>
 </head>
 <body>
 
@@ -25,6 +19,9 @@
       <div class="buttons">
         <button id="upload-btn">📤 Upload Photo</button>
         <button id="memories-btn">📖 See Memories</button>
+      </div>
+      <div class="logout-container hidden" id="logout-container">
+        <button id="logout-button">🚪 Logout</button>
       </div>
     </div>
   </div>

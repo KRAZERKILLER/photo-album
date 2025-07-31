@@ -24,7 +24,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Logout button visibility
   const logoutBtn = document.getElementById("logout-btn");
   if (logoutBtn) {
-    logoutBtn.style.display = session ? "block" : "none";
+   if (session) {
+      logoutBtn.classList.add("show");
+    } else {
+      logoutBtn.classList.remove("show");
+    }
     logoutBtn.addEventListener("click", async () => {
       await supabase.auth.signOut();
       window.location.href = "login.html";

@@ -1,3 +1,22 @@
+// --- Login Check ---
+if (!localStorage.getItem("isLoggedIn")) {
+  if (!location.pathname.endsWith("login.html")) {
+    window.location.href = "login.html";
+  }
+}
+
+// --- Logout Button on Cover Page ---
+document.addEventListener("DOMContentLoaded", () => {
+  const logoutBtn = document.getElementById("logout-btn");
+  if (logoutBtn) {
+    logoutBtn.style.display = localStorage.getItem("isLoggedIn") ? "block" : "none";
+    logoutBtn.addEventListener("click", () => {
+      localStorage.removeItem("isLoggedIn");
+      window.location.href = "login.html";
+    });
+  }
+});
+
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
 const supabaseUrl = 'https://ufmmufpulqyhvzvbiipo.supabase.co';

@@ -81,7 +81,7 @@
     <h2>Welcome Back 💌</h2>
 
     <div id="login-form">
-      <input type="text" id="username" placeholder="Username" />
+      <input type="email" id="email" placeholder="Email (e.g. gracie@example.com)" />
       <input type="password" id="password" placeholder="Password" />
       <button id="login-button">Open Scrapbook</button>
       <p id="login-error"></p>
@@ -93,37 +93,39 @@
     </div>
   </div>
 
-  <script>
-    const correctUsername = "gracie";
-    const correctPassword = "donge";
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-    // Elements
+    const SUPABASE_URL = 'https://ufmmufpulqvhyvzvbiipo.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVmbW11ZnB1bHF5aHZ6dmJpaXBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM4ODAwOTEsImV4cCI6MjA2OTQ1NjA5MX0.RfIlSotJtY5xDRytZag60mYYxF6mR8hnklQwzUR9eY0';
+    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
     const loginForm = document.getElementById("login-form");
     const alreadyLoggedIn = document.getElementById("already-logged-in");
     const loginError = document.getElementById("login-error");
 
-    // Check login state
-    if (localStorage.getItem("isLoggedIn") === "true") {
+    // Check if already logged in
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
       loginForm.style.display = "none";
       alreadyLoggedIn.style.display = "block";
     }
 
-    // Login action
-    document.getElementById("login-button").addEventListener("click", () => {
-      const username = document.getElementById("username").value.trim();
+    document.getElementById("login-button").addEventListener("click", async () => {
+      const email = document.getElementById("email").value.trim();
       const password = document.getElementById("password").value.trim();
 
-      if (username === correctUsername && password === correctPassword) {
-        localStorage.setItem("isLoggedIn", "true");
-        window.location.href = "index.html";
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
+      if (error) {
+        loginError.textContent = "⚠️ " + error.message;
       } else {
-        loginError.textContent = "Invalid username or password.";
+        window.location.href = "index.html";
       }
     });
 
-    // Logout action
-    document.getElementById("logout-button").addEventListener("click", () => {
-      localStorage.removeItem("isLoggedIn");
+    document.getElementById("logout-button").addEventListener("click", async () => {
+      await supabase.auth.signOut();
       location.reload();
     });
   </script>

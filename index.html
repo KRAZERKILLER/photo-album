@@ -9,6 +9,11 @@
 </head>
 <body>
 
+  <!-- 🛠 Fixed Logout Button Position -->
+  <div id="logout-container" class="logout-container fixed-logout" style="display: none;">
+    <button id="logout-button">🚪 Logout</button>
+  </div>
+
   <div id="cover-page" class="page">
     <div class="book-straps"></div>
     <div class="cover-content">
@@ -17,9 +22,6 @@
       <div class="buttons">
         <button id="upload-btn">📤 Upload Photo</button>
         <button id="memories-btn">📖 See Memories</button>
-      </div>
-      <div id="logout-container" class="logout-container" style="display: none;">
-        <button id="logout-button">🚪 Logout</button>
       </div>
     </div>
   </div>
@@ -64,34 +66,33 @@
     </div>
   </div>
 
- <!-- Supabase Logout Logic -->
-<script type="module">
-  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+  <!-- Supabase Logout Logic -->
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-  const SUPABASE_URL = 'https://ufmmufpulqvhyvzvbiipo.supabase.co';
-  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVmbW11ZnB1bHF5aHZ6dmJpaXBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM4ODAwOTEsImV4cCI6MjA2OTQ1NjA5MX0.RfIlSotJtY5xDRytZag60mYYxF6mR8hnklQwzUR9eY0';
-  const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+    const SUPABASE_URL = 'https://ufmmufpulqvhyvzvbiipo.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVmbW11ZnB1bHF5aHZ6dmJpaXBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM4ODAwOTEsImV4cCI6MjA2OTQ1NjA5MX0.RfIlSotJtY5xDRytZag60mYYxF6mR8hnklQwzUR9eY0';
+    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  const logoutButton = document.getElementById("logout-button");
-  const logoutContainer = document.getElementById("logout-container");
+    const logoutButton = document.getElementById("logout-button");
+    const logoutContainer = document.getElementById("logout-container");
 
-  (async () => {
-    const { data: { session } } = await supabase.auth.getSession();
+    (async () => {
+      const { data: { session } } = await supabase.auth.getSession();
 
-    if (session) {
-      logoutContainer.style.display = "block";
-    } else {
-      window.location.href = "login.html";
-    }
+      if (session) {
+        logoutContainer.style.display = "block";
+      } else {
+        window.location.href = "login.html";
+      }
 
-    logoutButton.addEventListener("click", async () => {
-      await supabase.auth.signOut();
-      window.location.href = "login.html";
-    });
-  })();
-</script>
+      logoutButton.addEventListener("click", async () => {
+        await supabase.auth.signOut();
+        window.location.href = "login.html";
+      });
+    })();
+  </script>
 
-  <!-- Your App Logic -->
   <script type="module" src="script.js" defer></script>
 </body>
 </html>

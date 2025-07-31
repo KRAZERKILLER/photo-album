@@ -6,12 +6,14 @@ const supabase = createClient(
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVmbW11ZnB1bHF5aHZ6dmJpaXBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM4ODAwOTEsImV4cCI6MjA2OTQ1NjA5MX0.RfIlSotJtY5xDRytZag60mYYxF6mR8hnklQwzUR9eY0'
 );
 
-// --- Auth Check ---
+// --- Auth Redirect Logic ---
 const { data: { session } } = await supabase.auth.getSession();
-if (!session) {
-  if (!location.pathname.endsWith("login.html")) {
-    window.location.href = "login.html";
-  }
+const isOnLoginPage = location.pathname.endsWith("login.html");
+
+if (!session && !isOnLoginPage) {
+  window.location.href = "login.html";
+} else if (session && isOnLoginPage) {
+  window.location.href = "index.html";
 }
 
 // --- Logout Button on Cover Page ---

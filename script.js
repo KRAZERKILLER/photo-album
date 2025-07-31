@@ -2,7 +2,6 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 
 const supabaseUrl = 'https://ufmmufpulqyhvzvbiipo.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVmbW11ZnB1bHF5aHZ6dmJpaXBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM4ODAwOTEsImV4cCI6MjA2OTQ1NjA5MX0.RfIlSotJtY5xDRytZag60mYYxF6mR8hnklQwzUR9eY0';
-
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 let currentPage = 0;
@@ -55,7 +54,6 @@ async function savePhoto() {
 
     captionInput.value = "";
     photoInput.value = "";
-
     document.getElementById('successModal').style.display = 'flex';
 
     setTimeout(() => {
@@ -71,7 +69,6 @@ async function savePhoto() {
 
 async function renderMemories() {
   const { data, error } = await supabase.from("photos").select("*").order("id", { ascending: true });
-
   if (error) {
     console.error("Error loading photos:", error);
     alert("Could not load memories.");
@@ -79,7 +76,6 @@ async function renderMemories() {
   }
 
   allPhotos = data;
-
   const book = document.getElementById("book");
   const noPhotoMsg = document.getElementById("no-photo");
 
@@ -118,7 +114,11 @@ function createMemory(photo) {
     mem.innerHTML = `
       <button class="delete-btn" data-id="${photo.id}">×</button>
       <img src="${photo.src}" alt="Memory image" />
-      <div class="caption">${photo.caption}</div>
+      <div class="caption-container">
+        <div class="caption" data-id="${photo.id}" contenteditable="false">${photo.caption}</div>
+        <button class="edit-btn" data-id="${photo.id}">✏️</button>
+        <button class="save-caption-btn hidden" data-id="${photo.id}">💾</button>
+      </div>
     `;
   } else {
     mem.innerHTML = `<div class="empty-slot"></div>`;
@@ -128,14 +128,12 @@ function createMemory(photo) {
 }
 
 function deletePhoto(id) {
-  console.log("Attempting to delete photo with id:", id);
   deleteId = id;
   document.getElementById("confirmModal").style.display = "flex";
 }
 
 async function confirmDelete() {
   if (deleteId !== null) {
-    console.log("Confirmed delete for id:", deleteId);
     await supabase.from("photos").delete().eq("id", deleteId);
     deleteId = null;
     renderMemories();
@@ -173,13 +171,40 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById('confirmDeleteBtn')?.addEventListener('click', confirmDelete);
 });
 
-// 💡 FIXED: robust delete button event delegation
-document.addEventListener('click', e => {
-  const btn = e.target.closest('.delete-btn');
-  if (btn) {
-    const id = btn.dataset.id;
-    if (id) {
-      deletePhoto(id);
+// Event delegation for dynamic elements
+document.addEventListener('click', async e => {
+  const delBtn = e.target.closest('.delete-btn');
+  const editBtn = e.target.closest('.edit-btn');
+  const saveBtn = e.target.closest('.save-caption-btn');
+
+  if (delBtn) {
+    const id = delBtn.dataset.id;
+    deletePhoto(id);
+  }
+
+  if (editBtn) {
+    const id = editBtn.dataset.id;
+    const captionDiv = document.querySelector(`.caption[data-id="${id}"]`);
+    const saveButton = document.querySelector(`.save-caption-btn[data-id="${id}"]`);
+    captionDiv.contentEditable = true;
+    captionDiv.focus();
+    saveButton.classList.remove("hidden");
+    editBtn.classList.add("hidden");
+  }
+
+  if (saveBtn) {
+    const id = saveBtn.dataset.id;
+    const captionDiv = document.querySelector(`.caption[data-id="${id}"]`);
+    const newCaption = captionDiv.innerText.trim();
+
+    const { error } = await supabase.from("photos").update({ caption: newCaption }).eq("id", id);
+    if (error) {
+      alert("Failed to update caption.");
+      return;
     }
+
+    captionDiv.contentEditable = false;
+    saveBtn.classList.add("hidden");
+    document.querySelector(`.edit-btn[data-id="${id}"]`).classList.remove("hidden");
   }
 });

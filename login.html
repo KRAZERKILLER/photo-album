@@ -100,16 +100,15 @@
   );
 
   const loginForm = document.getElementById("login-form");
-  const alreadyLoggedIn = document.getElementById("already-logged-in");
   const loginError = document.getElementById("login-error");
 
+  // 🚀 Check if already logged in and immediately redirect
   const { data: { session } } = await supabase.auth.getSession();
-
   if (session) {
-    // User is already logged in → redirect immediately
     window.location.href = "index.html";
   }
 
+  // 🎯 Handle login button click
   document.getElementById("login-button").addEventListener("click", async () => {
     const email = document.getElementById("email").value.trim();
     const password = document.getElementById("password").value.trim();
@@ -119,14 +118,10 @@
     if (error) {
       loginError.textContent = "⚠️ " + error.message;
     } else {
-      window.location.href = "index.html";
+      window.location.href = "index.html"; // ✅ Redirect after login
     }
   });
-
-  document.getElementById("logout-button").addEventListener("click", async () => {
-    await supabase.auth.signOut();
-    location.reload();
-  });
 </script>
+
 </body>
 </html>
